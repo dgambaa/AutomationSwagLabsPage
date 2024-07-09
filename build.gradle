@@ -1,0 +1,75 @@
+defaultTasks 'clean', 'test', 'aggregate'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "net.serenity-bdd:serenity-gradle-plugin:4.0.16"
+    }
+}
+
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: "net.serenity-bdd.serenity-gradle-plugin"
+
+sourceCompatibility = 11
+targetCompatibility = 11
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+ext {
+    slf4jVersion = '2.0.11'
+    serenityCoreVersion = '4.1.4'
+    serenityCucumberVersion = '4.1.4'
+    junitVersion = '4.13.2'
+    assertJVersion = '3.24.2'
+    logbackVersion = '1.4.14'
+    jacksonAnnotations = '2.13.3'
+    apachePoiVersion= '5.2.2'
+}
+
+dependencies {
+    implementation "net.serenity-bdd:serenity-core:${serenityCoreVersion}",
+            "net.serenity-bdd:serenity-cucumber:${serenityCucumberVersion}",
+            "net.serenity-bdd:serenity-screenplay:${serenityCoreVersion}",
+            "net.serenity-bdd:serenity-screenplay-webdriver:${serenityCoreVersion}",
+            "net.serenity-bdd:serenity-ensure:${serenityCoreVersion}",
+            "ch.qos.logback:logback-classic:${logbackVersion}",
+            "com.fasterxml.jackson.core:jackson-annotations:${jacksonAnnotations}",
+            "junit:junit:${junitVersion}",
+            "org.assertj:assertj-core:${assertJVersion}",
+            "org.apache.poi:poi:${apachePoiVersion}",
+            "org.apache.poi:poi-ooxml:${apachePoiVersion}",
+            "com.fasterxml.jackson.core:jackson-databind:2.17.1"
+
+}
+
+test {
+//    testLogging.showStandardStreams = true
+    systemProperties System.getProperties()
+//    maxParallelForks = 8
+}
+
+serenity {
+    // Specify the root package of any JUnit acceptance tests
+    testRoot="Swag Labs Website Automation"
+
+    // Specify the root directory of any Cucumber feature files
+    requirementsDir = "src/test/resources/features"
+}
+
+gradle.startParameter.continueOnFailure = true
+
+test.finalizedBy(aggregate)
